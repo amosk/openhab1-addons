@@ -324,9 +324,10 @@ public class SerialDevice implements SerialPortEventListener {
                                 String pattern = entry.getValue().pattern;
                                 // use pattern
                                 if (pattern != null) {
+                                    logger.debug("Pattern found to use for parsing");
                                     try {
                                         String[] matches = RegexPatternMatcher.getMatches(pattern, result);
-
+                                        logger.debug("RegexPatternMatcher.java returned size {}", matches.toString());
                                         for (int i = 0; i < matches.length; i++) {
                                             String match = matches[i];
 
@@ -340,7 +341,8 @@ public class SerialDevice implements SerialPortEventListener {
                                                 } else {
                                                     state = new StringType(match);
                                                 }
-
+                                                logger.debug("Result matched to: {}. Now publishing to eventPublisher",
+                                                        state);
                                                 eventPublisher.postUpdate(entry.getKey(), state);
                                             } catch (NumberFormatException e) {
                                                 logger.warn("Unable to convert regex result '{}' for item {} to number",
@@ -351,9 +353,14 @@ public class SerialDevice implements SerialPortEventListener {
                                         logger.warn("Unable to transform!", e);
                                     }
                                 } else if (entry.getValue().type == StringItem.class) {
+                                    logger.debug("Publishing to eventPublisher as StringItem: {}", result.toString());
                                     if (entry.getValue().base64) {
+                                        logger.debug(
+                                                "entry.getValue().base64 was true. Encoding bytes to Base64 String using charset {}",
+                                                charset);
                                         result = Base64.encodeBase64String(result.getBytes(charset));
                                     }
+                                    logger.debug("Published to eventPublisher as StringItem: {}", result.toString());
                                     eventPublisher.postUpdate(entry.getKey(), new StringType(result));
 
                                 } else if (entry.getValue().type == SwitchItem.class) {

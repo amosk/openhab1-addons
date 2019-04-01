@@ -89,8 +89,8 @@ public class RegexPatternMatcher {
      * If expression is not known the compiled pattern is cached in pattern cache
      *
      * @param regExpression regular expression to match or a substitution in form of "s/<regex>/result/g" (replace all)
-     *            or "s/<regex>/result/" (replace first)
-     * @param source text to search in
+     *                          or "s/<regex>/result/" (replace first)
+     * @param source        text to search in
      * @return Array of matched strings or empty array if none found
      * @throws TransformationException if regExpression or source is null
      * @see org.eclipse.smarthome.transform.regex.internal.RegExTranformationService RegExTranformationService
@@ -104,6 +104,7 @@ public class RegexPatternMatcher {
 
         // Check if RegEx is a substitution (s/<regex>/result/g) or (s/<regex>/result/)
         if (isSubtitution(regExpression)) {
+            logger.debug("using substitution matcher");
             Matcher substMatcher = SUBST_PATTERN.matcher(regExpression);
 
             // If there is no match of substitution, source is returned
@@ -120,10 +121,11 @@ public class RegexPatternMatcher {
                     result = source.trim().replaceFirst(regex, substitution);
                 }
             }
-
+            logger.debug("RegexPatterMatcher.java Returning string array to SerialBinding");
             return new String[] { result };
         } else {
             // Not a substitution, return matches
+            logger.debug("using matcher - not substitution");
             Matcher matcher = getPattern(regExpression).matcher(source.trim());
 
             List<String> results = new ArrayList<>();
@@ -133,7 +135,7 @@ public class RegexPatternMatcher {
                 // This way you can use secondary groups to quantify occurrence count
                 results.add(matcher.group(1));
             }
-
+            logger.debug("RegexPatterMatcher.java Returning string array to SerialBinding. Size: {}", results.size());
             return results.toArray(new String[results.size()]);
         }
     }
